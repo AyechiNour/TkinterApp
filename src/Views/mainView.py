@@ -1,4 +1,4 @@
-from windows.updateObjectiveWindow import UpdateObjectiveWindow
+from windows.signInWindow import SignInWindow
 
 if __name__ == "__main__":
-    app = UpdateObjectiveWindow()
+    app = SignInWindow()

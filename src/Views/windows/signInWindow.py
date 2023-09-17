@@ -6,12 +6,14 @@ from src.Views.widgets.input import InputField
 from src.Views.widgets.input import InputField
 from src.Views.widgets.label import Label
 from src.Views.widgets.boutton import CustomButton
+from src.Controllers.authentificationController import AuthentificationController
+from tkinter import messagebox
 
 class SignInWindow:
     def __init__(self):
         def update_frame_size(event):
-            frame_width = root.winfo_width() // 2
-            frame_height = root.winfo_height()
+            frame_width = self.root.winfo_width() // 2
+            frame_height = self.root.winfo_height()
             frame1.config(width=frame_width, height=frame_height)
             frame2.config(width=frame_width, height=frame_height)
 
@@ -23,15 +25,17 @@ class SignInWindow:
             parent.grid_columnconfigure(0, weight=1)
             parent.grid_columnconfigure(2, weight=1)
 
-        root = tk.Tk()
-        root.title("Login")
-        root.geometry("1200x600")
-        root.configure(bg="white")
-        root.minsize(700, 500)
+        self.root = tk.Tk()
+        self.root.title("Login")
+        screen_width = self.root.winfo_screenwidth()
+        screen_height = self.root.winfo_screenheight()
+        self.root.geometry(f"{screen_width}x{screen_height}")
+        self.root.configure(bg="white")
+        self.root.minsize(700, 500)
 
         # Création de deux frames
-        frame1 = tk.Frame(root, bg="#F1F2F7")
-        frame2 = tk.Frame(root, bg="white")
+        frame1 = tk.Frame(self.root, bg="#F1F2F7")
+        frame2 = tk.Frame(self.root, bg="white")
 
         # Placement initial des frames dans la grille
         frame1.grid(row=0, column=0)
@@ -69,19 +73,19 @@ class SignInWindow:
         label_welcome.grid(row=1, column=0, sticky="w", pady=(0, 40))
 
         #email
-        input_email = InputField(frame3, label_text="Email", show="")
-        input_email.grid(row=2, column=0)
+        self.input_email = InputField(frame3, label_text="Email", show="")
+        self.input_email.grid(row=2, column=0)
 
         #password
-        input_password = InputField(frame3, label_text="Password", show="*")
-        input_password.grid(row=3, column=0, pady=(20,2))
+        self.input_password = InputField(frame3, label_text="Password", show="*")
+        self.input_password.grid(row=3, column=0, pady=(20,2))
 
         #Forget password
-        passwordButton = CustomButton(frame3, row=4, column=0, text="Forget password?", bg_color="white", fg_color="#969696", borderwidth=0, padding=(0, 0), font=('roboto',10,'normal'), active_bg_color="white")
-        passwordButton.grid(sticky="e")
+        self.passwordButton = CustomButton(frame3, row=4, column=0, text="Forget password?", bg_color="white", fg_color="#969696", borderwidth=0, padding=(0, 0), font=('roboto',10,'normal'), active_bg_color="white")
+        self.passwordButton.grid(sticky="e")
 
         #signInButton
-        signInButton = CustomButton(frame3, row=5, column=0, text="Sign In", bg_color="#0B59B2", fg_color="white", borderwidth=1, padding=(0, 8), font=('roboto',10,'bold'), active_bg_color="#0B59B2")
+        signInButton = CustomButton(frame3, row=5, column=0, text="Sign In", bg_color="#0B59B2", fg_color="white", borderwidth=1, padding=(0, 8), font=('roboto',10,'bold'), active_bg_color="#0B59B2", click_function=self.signIn)
         signInButton.grid(pady=(30,5), sticky="snew")
 
         #Creation de frame5
@@ -93,11 +97,11 @@ class SignInWindow:
         label_accountQuestion.grid(row=0, column=0, pady=(0,0))
 
         #signUpButton
-        signUpButton = CustomButton(frame5, row=0, column=1, text="Sign Up", bg_color="white", fg_color="#111858", borderwidth=0, padding=(0,0), font=('roboto',10,'bold'), active_bg_color="white")
+        signUpButton = CustomButton(frame5, row=0, column=1, text="Sign Up", bg_color="white", fg_color="#111858", borderwidth=0, padding=(0,0), font=('roboto',10,'bold'), active_bg_color="white", click_function = self.close_window)
         signUpButton.grid(pady=(0,0), padx=(0,0), sticky="w")
 
         # Création de frame pour logo sagemcom
-        frame0 = tk.Frame(root, bg="red",width=100, height=100)
+        frame0 = tk.Frame(self.root, bg="red",width=100, height=100)
         frame0.grid(row=0, column=1, sticky="se")
 
         # Chargez l'image à l'aide de PIL
@@ -115,6 +119,23 @@ class SignInWindow:
         label_imageLogo.grid(row=0, column=1) 
 
         # Configuration pour redimensionner les frames
-        root.bind("<Configure>", update_frame_size)
+        self.root.bind("<Configure>", update_frame_size)
 
-        root.mainloop()
+        self.root.mainloop()
+
+    def signIn(self):
+        input_email = self.input_email.get_value()
+        input_password = self.input_password.get_value()
+        try:
+            user = AuthentificationController.signIn(input_email,input_password)
+            from src.Views.windows.objectiveManagementWindow import ObjectiveManagementWindow
+            self.root.destroy()
+            objectiveManagementWindow = ObjectiveManagementWindow(user)  
+        except ValueError as e:
+            messagebox.showinfo("Alerte", str(e))
+            print("Erreur lors de l'inscription :", str(e))
+        
+    def close_window(self): 
+        from src.Views.windows.signUpWindow import SignUpWindow  
+        self.root.destroy()
+        signUpWindow = SignUpWindow()

@@ -7,7 +7,7 @@ from src.Views.widgets.input import InputField
 from src.Views.widgets.label import Label
 from src.Views.widgets.boutton import CustomButton
 
-class CreateObjectiveWindow:
+class ObjectiveManagementWindow:
     def __init__(self):
         def update_frame_size(event):
             frame_width = root.winfo_width()
